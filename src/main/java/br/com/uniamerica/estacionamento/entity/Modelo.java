@@ -1,5 +1,5 @@
 package br.com.uniamerica.estacionamento.entity;
-
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,7 +15,8 @@ public class Modelo extends AbstractEntity{
     private String nome;
 
     @Getter@Setter
-    @Column(name = "marca",length = 100,nullable = false)
-    private String marca;
+    @ManyToOne
+    @JoinColumn(name = "marca",nullable = false)
+    private Marca marca;
 
 }
