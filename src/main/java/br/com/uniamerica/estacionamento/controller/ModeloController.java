@@ -77,8 +77,9 @@ public class ModeloController {
     public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
         final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
         List<Veiculo> veiculos = this.modeloRepository.findVeiculoByModelo(modeloBanco);
+
         if(veiculos == null){
-            this.modeloRepository.delete(modeloBanco);
+            this.modeloService.deleta(modeloBanco);
         }else{
             modeloBanco.setAtivo(false);
             this.modeloRepository.save(modeloBanco);

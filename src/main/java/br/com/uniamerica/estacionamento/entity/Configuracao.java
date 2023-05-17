@@ -31,11 +31,15 @@ public class Configuracao extends AbstractEntity{
 
     @Getter@Setter
     @Column(name = "tempo_desconto")
-    private LocalTime tempoDesconto;
+    private BigDecimal tempoDesconto;
 
     @Getter@Setter
     @Column(name = "gerar_desconto")
-    private boolean gerarDesconto;
+    private Boolean gerarDesconto;
+
+    @Getter@Setter
+    @Column(name = "necessario_desconto")
+    private Integer necessarioDesconto;
 
     @Getter@Setter
     @Column(name = "vagas_moto")

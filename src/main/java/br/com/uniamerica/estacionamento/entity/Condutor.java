@@ -1,8 +1,10 @@
 package br.com.uniamerica.estacionamento.entity;
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @Entity
@@ -23,10 +25,10 @@ public class Condutor extends AbstractEntity{
 
     @Getter@Setter
     @Column(name = "tempo_gasto")
-    private LocalTime tempoPago;
+    private Integer tempoPago;
 
     @Getter@Setter
     @Column(name = "tempo_desconto")
-    private LocalTime tempoDesconto;
+    private BigDecimal tempoDesconto;
 
 }
