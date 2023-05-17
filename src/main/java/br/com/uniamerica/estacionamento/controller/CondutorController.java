@@ -67,8 +67,9 @@ public class CondutorController {
     public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
         final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
         List<Movimentacao> movimentacao = this.condutorRepository.findMovimentacaoByCondutor(condutor);
+
         if(movimentacao == null){
-            this.condutorRepository.delete(condutor);
+            this.condutorService.deleta(condutor);
         }else{
             condutor.setAtivo(false);
             this.condutorRepository.save(condutor);

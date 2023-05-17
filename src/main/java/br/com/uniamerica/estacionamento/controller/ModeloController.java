@@ -5,6 +5,7 @@ import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.ModeloRepository;
+import br.com.uniamerica.estacionamento.service.ModeloService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,6 +23,9 @@ public class ModeloController {
 
     @Autowired
     private ModeloRepository modeloRepository;
+
+    @Autowired
+    private ModeloService modeloService;
 
 
     @GetMapping("/{id}")

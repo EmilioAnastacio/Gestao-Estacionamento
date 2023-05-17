@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Service
 public class MovimentacaoService {
 
@@ -39,6 +42,21 @@ public class MovimentacaoService {
         Assert.isTrue(!moviBanco.getId().equals(movi.getId()), "nao foi possivel encontrar o registro");
 
         movimentacaoRepository.save(movi);
+    }
+
+    @Transactional
+    public void horaFinal(final Long id){
+        final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
+        final LocalDateTime saida = LocalDateTime.now();
+
+        Assert.isTrue(moviBanco.getTempo() != null, "movimentacao nao encontrada");
+
+        Duration duracaoHora = Duration.between(moviBanco.getEntrada(), saida);
+
+        moviBanco.setTempo(duracaoHora);
+        moviBanco.setSaida(saida);
+
+        this.movimentacaoRepository.save(moviBanco);
     }
 
     @Transactional

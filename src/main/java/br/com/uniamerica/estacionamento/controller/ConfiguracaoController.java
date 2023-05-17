@@ -3,6 +3,7 @@ import br.com.uniamerica.estacionamento.entity.Configuracao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.ConfiguracaoRepository;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
+import br.com.uniamerica.estacionamento.service.ConfiguracaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,9 @@ public class ConfiguracaoController {
 
     @Autowired
     private ConfiguracaoRepository configuracaoRepository;
+
+    @Autowired
+    private ConfiguracaoService configuracaoService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
@@ -37,11 +41,14 @@ public class ConfiguracaoController {
 
     @PutMapping
     public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Configuracao configuracao) {
+
         try {
             final Configuracao configuracaoBanco = this.configuracaoRepository.findById(id).orElse(null);
+
             if(configuracaoBanco == null || !configuracaoBanco.getId().equals(configuracao.getId())){
                 throw new RuntimeException("O registro nao foi encontrado");
             }
+
             this.configuracaoRepository.save(configuracao);
             return ResponseEntity.ok("registro cadastrado");
 

@@ -74,9 +74,11 @@ public class MarcaController {
     @DeleteMapping
     public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
         final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
+
         List<Modelo> modelos = this.marcaRepository.findModeloByMarca(marcaBanco);
+
         if(modelos == null){
-            this.marcaRepository.delete(marcaBanco);
+            this.marcaService.deleta(marcaBanco);
         }else{
             marcaBanco.setAtivo(false);
             this.marcaRepository.save(marcaBanco);

@@ -3,6 +3,7 @@ import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.MovimentacaoRepository;
+import br.com.uniamerica.estacionamento.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class MovimentacaoController {
 
     @Autowired
     private MovimentacaoRepository movimentacaoRepository;
+
+    @Autowired
+    private MovimentacaoService movimentacaoService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
@@ -64,11 +68,22 @@ public class MovimentacaoController {
         }
     }
 
+    @PutMapping("/hora")
+    public ResponseEntity<?> horaFinal(@RequestParam("id") final Long id){
+        try {
+            this.movimentacaoService.horaFinal(id);
+            return ResponseEntity.ok("Registro alterado");
+
+        }catch (RuntimeException e){
+            return ResponseEntity.internalServerError().body("erro" + e.getMessage());
+        }
+    }
+
     @DeleteMapping
     public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
         final Movimentacao movimentacaoBanco = this.movimentacaoRepository.findById(id).orElse(null);
             movimentacaoBanco.setAtivo(false);
-            this.movimentacaoRepository.save(movimentacaoBanco);
+            this.movimentacaoService.deleta(movimentacaoBanco);
         return ResponseEntity.ok("Movimentacao deletado");
     }
 }

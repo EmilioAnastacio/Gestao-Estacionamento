@@ -4,6 +4,7 @@ import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.ModeloRepository;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
+import br.com.uniamerica.estacionamento.service.VeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ public class VeiculoController {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
+
+    @Autowired
+    private VeiculoService veiculoService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
@@ -68,9 +72,11 @@ public class VeiculoController {
     @DeleteMapping
     public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
         final Veiculo veiculo = this.veiculoRepository.findById(id).orElse(null);
+
         List<Movimentacao> movimentacao = this.veiculoRepository.findMovimentacaoByVeiculo(veiculo);
+
         if(movimentacao == null){
-            this.veiculoRepository.delete(veiculo);
+            this.veiculoService.deleta(veiculo);
         }else{
             veiculo.setAtivo(false);
             this.veiculoRepository.save(veiculo);

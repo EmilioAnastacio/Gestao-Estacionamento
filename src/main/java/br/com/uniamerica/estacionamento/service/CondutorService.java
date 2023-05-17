@@ -59,6 +59,8 @@ public class CondutorService {
 
         List<Movimentacao> movimentacaoLista = this.condutorRepository.findMovimentacaoByCondutor(condutorBanco);
 
+        System.out.println(movimentacaoLista);
+
         if(movimentacaoLista == null){
             this.condutorRepository.delete(condutorBanco);
         }else {
