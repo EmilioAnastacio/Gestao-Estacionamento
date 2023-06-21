@@ -21,31 +21,31 @@ public class ModeloService {
     private ModeloRepository modeloRepository;
 
 
-    @Transactional
-    public void cadastrar(Modelo modelo){
+    @Transactional(rollbackFor = Exception.class)
+    public void cadastrar(final Modelo modelo){
+
         Assert.isTrue(modelo.getNome() != null, "nome nao informado");
         Assert.isTrue(modelo.getMarca() != null, "marca nao informada");
 
-        modeloRepository.save(modelo);
+        this.modeloRepository.save(modelo);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void editar(final Long id, Modelo modelo){
 
         Assert.isTrue(modelo.getNome() != null, "nome nao informado");
         Assert.isTrue(modelo.getMarca() != null, "marca nao informada");
 
         final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-        Assert.isTrue(modeloBanco != null, "nao foi possivel encontrar o registro");
-        Assert.isTrue(!modeloBanco.getId().equals(modelo.getId()), "nao foi possivel encontrar o registro");
+        Assert.isTrue(modeloBanco != null || !modeloBanco.getId().equals(id), "nao foi possivel encontrar o registro");
 
-        modeloRepository.save(modelo);
+        this.modeloRepository.save(modelo);
     }
 
     @Transactional
-    public void deleta(final Modelo modelo) {
+    public void excluir(final Long id) {
 
-        final Modelo modeloBanco = this.modeloRepository.findById(modelo.getId()).orElse(null);
+        final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
 
         List<Veiculo> modeloLista = this.modeloRepository.findVeiculoByModelo(modeloBanco);
 
@@ -53,7 +53,8 @@ public class ModeloService {
             this.modeloRepository.delete(modeloBanco);
         } else {
             modeloBanco.setAtivo(false);
-            this.modeloRepository.save(modelo);
         }
+        modeloBanco.setAtivo(false);
+        this.modeloRepository.save(modeloBanco);
     }
 }

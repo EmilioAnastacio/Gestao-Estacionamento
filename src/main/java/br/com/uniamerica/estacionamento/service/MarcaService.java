@@ -18,32 +18,29 @@ public class MarcaService {
     @Autowired
     private MarcaRepository marcaRepository;
 
-    @Transactional
-    public void cadastrar(Marca marca){
+    @Transactional(rollbackFor = Exception.class)
+    public void cadastrar(final Marca marca){
 
         Assert.isTrue(marca.getNome() != null, "nome nao informado");
 
-        marcaRepository.save(marca);
+        this.marcaRepository.save(marca);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void editar(final Long id, Marca marca){
 
         Assert.isTrue(marca.getNome() != null, "nome nao informado");
 
         final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
-        Assert.isTrue(marcaBanco != null, "nao foi possivel encontrar o registro");
-        Assert.isTrue(!marcaBanco.getId().equals(marca.getId()),"nao foi possivel entrar no registro");
-
-        marcaRepository.save(marca);
-
-
+        Assert.isTrue(marcaBanco != null || !marcaBanco.getId().equals(id), "nao foi possivel encontrar o registro");
+        this.marcaRepository.save(marca);
     }
 
     @Transactional
-    public void deleta(final Marca marca) {
+    public void excluir(final Long id) {
 
-        final Marca marcaBanco = this.marcaRepository.findById(marca.getId()).orElse(null);
+
+        final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
 
         List<Modelo> modeloLista = this.marcaRepository.findModeloByMarca(marcaBanco);
 
@@ -51,7 +48,8 @@ public class MarcaService {
             this.marcaRepository.delete(marcaBanco);
         } else {
             marcaBanco.setAtivo(false);
-            this.marcaRepository.save(marca);
         }
+        marcaBanco.setAtivo(false);
+        this.marcaRepository.save(marcaBanco);
     }
 }

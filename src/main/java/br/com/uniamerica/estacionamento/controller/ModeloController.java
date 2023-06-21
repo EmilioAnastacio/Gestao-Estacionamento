@@ -23,13 +23,12 @@ public class ModeloController {
 
     @Autowired
     private ModeloRepository modeloRepository;
-
     @Autowired
     private ModeloService modeloService;
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
         return modelo == null
@@ -50,22 +49,20 @@ public class ModeloController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
         try{
-            this.modeloRepository.save(modelo);
+            this.modeloService.cadastrar(modelo);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getMessage());
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(
+            @PathVariable("id") final Long id,
+            @RequestBody final Modelo modelo) {
         try {
-            final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-            if(modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())){
-                throw new RuntimeException("O registro nao foi encontrado");
-            }
-            this.modeloRepository.save(modelo);
-            return ResponseEntity.ok("registro cadastrado");
+            this.modeloService.editar(id, modelo);
+            return ResponseEntity.ok("registro atualizado com sucesso");
 
         }catch (DataIntegrityViolationException e){
             return ResponseEntity.internalServerError().body("erro" + e.getCause().getCause().getMessage());
@@ -73,19 +70,15 @@ public class ModeloController {
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());
         }
     }
-    @DeleteMapping
-    public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
-        final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
-        List<Veiculo> veiculos = this.modeloRepository.findVeiculoByModelo(modeloBanco);
-
-        if(veiculos == null){
-            this.modeloService.deleta(modeloBanco);
-        }else{
-            modeloBanco.setAtivo(false);
-            this.modeloRepository.save(modeloBanco);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>deleta(@PathVariable("id") final Long id){
+        try {
+            this.modeloService.excluir(id);
+            return ResponseEntity.ok("Registro excluido com sucesso.");
         }
-        return ResponseEntity.ok("Modelo deletado");
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
-
 
 }

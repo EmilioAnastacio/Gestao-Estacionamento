@@ -19,14 +19,13 @@ public class MarcaController {
 
     @Autowired
     private MarcaRepository marcaRepository;
-
     @Autowired
     private MarcaService marcaService;
 
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Marca marca = this.marcaRepository.findById(id).orElse(null);
         return marca == null
@@ -54,16 +53,13 @@ public class MarcaController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Marca marca) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(
+            @PathVariable("id") final Long id,
+            @RequestBody final Marca marca) {
         try {
-            final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
-            if(marcaBanco == null || !marcaBanco.getId().equals(marca.getId())){
-                throw new RuntimeException("O registro nao foi encontrado");
-            }
-            this.marcaRepository.save(marca);
-            return ResponseEntity.ok("registro cadastrado");
-
+            this.marcaService.editar(id, marca);
+            return ResponseEntity.ok("Registro atualizado com sucesso. ");
         }catch (DataIntegrityViolationException e){
             return ResponseEntity.internalServerError().body("erro" + e.getCause().getCause().getMessage());
         }catch (RuntimeException e){
@@ -71,19 +67,15 @@ public class MarcaController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
-        final Marca marcaBanco = this.marcaRepository.findById(id).orElse(null);
-
-        List<Modelo> modelos = this.marcaRepository.findModeloByMarca(marcaBanco);
-
-        if(modelos == null){
-            this.marcaService.deleta(marcaBanco);
-        }else{
-            marcaBanco.setAtivo(false);
-            this.marcaRepository.save(marcaBanco);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>deleta(@PathVariable("id") final Long id){
+        try {
+            this.marcaService.excluir(id);
+            return ResponseEntity.ok("Registro excluido com sucesso.");
         }
-        return ResponseEntity.ok("Marca deletado");
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
 }
