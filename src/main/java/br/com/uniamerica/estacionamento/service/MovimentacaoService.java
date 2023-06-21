@@ -30,15 +30,15 @@ public class MovimentacaoService {
     @Autowired
     private CondutorRepository condutorRepository;
 
-    @Transactional
-    public void cadastrar(Movimentacao movi){
+    @Transactional(rollbackFor = Exception.class)
+    public void cadastrar(final Movimentacao movi){
 
         Assert.isTrue(movi.getVeiculo() != null, "Veiculo nao informado");
         Assert.isTrue(movi.getCondutor() != null, "Condutor nao informada");
         Assert.isTrue(movi.getEntrada() != null, "Entradada nao informado");
         Assert.isTrue(movi.getSaida() != null, "Saida nao informada");
 
-        movimentacaoRepository.save(movi);
+        this.movimentacaoRepository.save(movi);
 
     }
 
@@ -58,13 +58,13 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public void horaFinal(final Long id){
+    public Relatorio horaFinal(final Long id){
 
-        //busca a movimentacao do momento
+        //busca a movimentacao do momento pelo id
         final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
         Assert.isTrue(moviBanco != null, "movimentacao nao encontrada");
 
-        //busca uma duração q é entre a entrada e a saida
+        //cria uma duração q é entre a entrada e a saida
         final LocalDateTime saida = LocalDateTime.now();
         Duration duracaoHora = Duration.between(moviBanco.getEntrada(), saida);
 
@@ -110,16 +110,22 @@ public class MovimentacaoService {
             moviBanco.setValorDeconto(precos.subtract(valor_desconto));
             condutor.setTempoDesconto(new BigDecimal(0));
         }
-
         //sets no banco, do preco com o valor de desconto
         moviBanco.setValorTotal(precos.subtract(valor_desconto));
         moviBanco.setValorHoraTotal(configuracao.getValorHora());
         moviBanco.setValorHoraTotal(configuracao.getValorMinutoMulta());
 
 
+        Relatorio relatorio = new Relatorio(moviBanco.getEntrada(), moviBanco.getSaida(), moviBanco.getCondutor(),
+                moviBanco.getVeiculo(), moviBanco.getTempoHora(), condutor.getTempoDesconto(),
+                precos.subtract(valor_desconto).setScale(2,RoundingMode.HALF_EVEN),
+                moviBanco.getValorDeconto());
+
 
         this.condutorRepository.save(condutor);
         this.movimentacaoRepository.save(moviBanco);
+
+        return relatorio;
     }
 
     @Transactional

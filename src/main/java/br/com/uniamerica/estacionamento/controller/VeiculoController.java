@@ -46,7 +46,7 @@ public class VeiculoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Veiculo veiculo){
         try{
-            this.veiculoRepository.save(veiculo);
+            this.veiculoService.cadastrar(veiculo);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getStackTrace());
@@ -75,7 +75,7 @@ public class VeiculoController {
 
         List<Movimentacao> movimentacao = this.veiculoRepository.findMovimentacaoByVeiculo(veiculo);
 
-        if(movimentacao == null){
+        if(movimentacao.isEmpty()){
             this.veiculoService.deleta(veiculo);
         }else{
             veiculo.setAtivo(false);

@@ -47,7 +47,7 @@ public class MarcaService {
 
         List<Modelo> modeloLista = this.marcaRepository.findModeloByMarca(marcaBanco);
 
-        if (modeloLista == null) {
+        if (modeloLista.isEmpty()) {
             this.marcaRepository.delete(marcaBanco);
         } else {
             marcaBanco.setAtivo(false);

@@ -49,7 +49,7 @@ public class ModeloService {
 
         List<Veiculo> modeloLista = this.modeloRepository.findVeiculoByModelo(modeloBanco);
 
-        if (modeloLista == null) {
+        if (modeloLista.isEmpty()) {
             this.modeloRepository.delete(modeloBanco);
         } else {
             modeloBanco.setAtivo(false);

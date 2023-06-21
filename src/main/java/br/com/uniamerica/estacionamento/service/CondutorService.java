@@ -50,9 +50,6 @@ public class CondutorService {
         String numero = "^\\(\\d{2}\\)\\d{9}";
         Assert.isTrue(condutor.getTelefone().matches(numero), "Erro no numero");
 
-        Assert.isTrue(this.condutorRepository.findByCpf(condutor.getCpf()).isEmpty(), "cpf ja existe boy");
-        Assert.isTrue(this.condutorRepository.findByTelefone(condutor.getTelefone()).isEmpty(), "numero ja existe boy");
-
         Assert.isTrue(condutorBanco != null || !condutorBanco.getId().equals(condutor.getId()), "nao deu pra indentificar");
 
         this.condutorRepository.save(condutor);
@@ -68,7 +65,7 @@ public class CondutorService {
 
         System.out.println(movimentacaoLista);
 
-        if(movimentacaoLista == null){
+        if(movimentacaoLista.isEmpty()){
             this.condutorRepository.delete(condutorBanco);
         }else {
             condutorBanco.setAtivo(false);

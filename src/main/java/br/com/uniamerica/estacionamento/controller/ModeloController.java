@@ -50,7 +50,7 @@ public class ModeloController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
         try{
-            this.modeloRepository.save(modelo);
+            this.modeloService.cadastrar(modelo);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getMessage());
@@ -78,7 +78,7 @@ public class ModeloController {
         final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
         List<Veiculo> veiculos = this.modeloRepository.findVeiculoByModelo(modeloBanco);
 
-        if(veiculos == null){
+        if(veiculos.isEmpty()){
             this.modeloService.deleta(modeloBanco);
         }else{
             modeloBanco.setAtivo(false);

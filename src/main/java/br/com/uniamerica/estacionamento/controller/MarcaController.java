@@ -77,7 +77,7 @@ public class MarcaController {
 
         List<Modelo> modelos = this.marcaRepository.findModeloByMarca(marcaBanco);
 
-        if(modelos == null){
+        if(modelos.isEmpty()){
             this.marcaService.deleta(marcaBanco);
         }else{
             marcaBanco.setAtivo(false);

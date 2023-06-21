@@ -27,9 +27,9 @@ public class VeiculoService {
         Assert.isTrue(veiculo.getAno() != null, "ano nao identificado, ou fora do padrao");
 
         String placaAntiga = "^[A-Z]{3}-\\d{4}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
         String placaNova = "^[A-Z]{3}\\d{1}[A-Z]{1}\\d{2}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
 
         this.veiculoRepository.save(veiculo);
 
@@ -49,9 +49,9 @@ public class VeiculoService {
         Assert.isTrue(veiculo.getAno() != null, "ano nao foi colocado");
 
         String placaAntiga = "^[A-Z]{3}-\\d{4}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
         String placaNova = "^[A-Z]{3}\\d{1}[A-Z]{1}\\d{2}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
 
         Assert.isTrue(veiculoBanco == null || !veiculoBanco.getId().equals(veiculo.getId()), "nao deu pra indentificar");
 
@@ -65,7 +65,7 @@ public class VeiculoService {
 
         List<Movimentacao> veiculoLista = this.veiculoRepository.findMovimentacaoByVeiculo(veiculoBanco);
 
-        if (veiculoLista == null) {
+        if (veiculoLista.isEmpty()) {
             this.veiculoRepository.delete(veiculo);
         } else {
             veiculoBanco.setAtivo(false);

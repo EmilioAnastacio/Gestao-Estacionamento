@@ -1,4 +1,5 @@
 package br.com.uniamerica.estacionamento.controller;
+import br.com.uniamerica.estacionamento.Relatorio;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
@@ -44,10 +45,10 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Movimentacao movimentacao){
         try{
-            this.movimentacaoRepository.save(movimentacao);
+            this.movimentacaoService.cadastrar(movimentacao);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("erro" +e.getStackTrace());
+            return ResponseEntity.badRequest().body("erro AQUIIIIIII" +e.getMessage());
         }
     }
 
@@ -71,8 +72,8 @@ public class MovimentacaoController {
     @PutMapping("/hora")
     public ResponseEntity<?> horaFinal(@RequestParam("id") final Long id){
         try {
-            this.movimentacaoService.horaFinal(id);
-            return ResponseEntity.ok("Registro alterado");
+            Relatorio relatorio = this.movimentacaoService.horaFinal(id);
+            return ResponseEntity.ok(relatorio);
 
         }catch (RuntimeException e){
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());

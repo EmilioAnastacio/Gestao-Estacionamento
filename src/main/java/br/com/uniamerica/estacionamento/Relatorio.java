@@ -6,10 +6,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 public class Relatorio {
+
+
     
     @Getter
     @Setter
@@ -30,12 +34,23 @@ public class Relatorio {
     private Integer quantidadeHoras;
     @Getter
     @Setter
-    private Integer quantidadeDesconto;
+    private BigDecimal quantidadeDesconto;
 
     @Getter
     @Setter
-    private Integer valorPagar;
+    private BigDecimal valorPagar;
     @Getter
     @Setter
-    private Integer valorDesconto;
+    private BigDecimal valorDesconto;
+
+    public Relatorio(LocalDateTime entrada, LocalDateTime saida, Condutor condutor, Veiculo veiculo, Integer quantidadeHoras, BigDecimal quantidadeDesconto, BigDecimal valorPagar, BigDecimal valorDesconto) {
+        this.entrada = entrada;
+        this.saida = saida;
+        this.condutor = condutor;
+        this.veiculo = veiculo;
+        this.quantidadeHoras = quantidadeHoras;
+        this.quantidadeDesconto = quantidadeDesconto;
+        this.valorPagar = valorPagar;
+        this.valorDesconto = valorDesconto;
+    }
 }

@@ -13,6 +13,6 @@ public interface ModeloRepository extends JpaRepository<Modelo, Long> {
     @Query("from Modelo where ativo = 1")
         public List<Modelo> findAtivo();
 
-    @Query("from Veiculo where Modelo = :modelo")
+    @Query("from Veiculo where modelo = :modelo")
         public List<Veiculo> findVeiculoByModelo(@Param("modelo") final Modelo modelo);
 }
