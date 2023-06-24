@@ -25,7 +25,7 @@ public class VeiculoController {
     private VeiculoService veiculoService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Veiculo veiculo = this.veiculoRepository.findById(id).orElse(null);
         return veiculo == null
@@ -46,42 +46,33 @@ public class VeiculoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Veiculo veiculo){
         try{
-            this.veiculoRepository.save(veiculo);
+            this.veiculoService.cadastrar(veiculo);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getStackTrace());
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Veiculo veiculo) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable("id") final Long id, @RequestBody final Veiculo veiculo) {
         try {
-            final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
-            if(veiculoBanco == null || !veiculoBanco.getId().equals(veiculo.getId())){
-                throw new RuntimeException("O registro nao foi encontrado");
-            }
-            this.veiculoRepository.save(veiculo);
-            return ResponseEntity.ok("registro cadastrado");
-
+            this.veiculoService.editar(id, veiculo);
+            return ResponseEntity.ok("Registro atualizado com sucesso. ");
         }catch (DataIntegrityViolationException e){
             return ResponseEntity.internalServerError().body("erro" + e.getCause().getCause().getMessage());
         }catch (RuntimeException e){
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());
         }
     }
-    @DeleteMapping
-    public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
-        final Veiculo veiculo = this.veiculoRepository.findById(id).orElse(null);
-
-        List<Movimentacao> movimentacao = this.veiculoRepository.findMovimentacaoByVeiculo(veiculo);
-
-        if(movimentacao == null){
-            this.veiculoService.deleta(veiculo);
-        }else{
-            veiculo.setAtivo(false);
-            this.veiculoRepository.save(veiculo);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>excluir(@PathVariable("id") final Long id){
+        try {
+            this.veiculoService.excluir(id);
+            return ResponseEntity.ok("Registro excluido com sucesso.");
         }
-        return ResponseEntity.ok("Veiculo deletado");
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
 

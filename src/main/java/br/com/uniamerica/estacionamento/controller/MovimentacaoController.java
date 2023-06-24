@@ -1,4 +1,5 @@
 package br.com.uniamerica.estacionamento.controller;
+import br.com.uniamerica.estacionamento.Relatorio;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
@@ -23,7 +24,7 @@ public class MovimentacaoController {
     private MovimentacaoService movimentacaoService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Movimentacao movimentacao = this.movimentacaoRepository.findById(id).orElse(null);
         return movimentacao == null
@@ -44,23 +45,18 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Movimentacao movimentacao){
         try{
-            this.movimentacaoRepository.save(movimentacao);
+            this.movimentacaoService.cadastrar(movimentacao);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getStackTrace());
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Movimentacao movimentacao) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         try {
-            final Movimentacao movimentacaobanco = this.movimentacaoRepository.findById(id).orElse(null);
-            if(movimentacaobanco == null || !movimentacaobanco.getId().equals(movimentacao.getId())){
-                throw new RuntimeException("O registro nao foi encontrado");
-            }
-            this.movimentacaoRepository.save(movimentacao);
-            return ResponseEntity.ok("registro cadastrado");
-
+            this.movimentacaoService.editar(id, movimentacao);
+            return ResponseEntity.ok("Registro atualizado com sucesso. ");
         }catch (DataIntegrityViolationException e){
             return ResponseEntity.internalServerError().body("erro" + e.getCause().getCause().getMessage());
         }catch (RuntimeException e){
@@ -68,22 +64,25 @@ public class MovimentacaoController {
         }
     }
 
-    @PutMapping("/hora")
-    public ResponseEntity<?> horaFinal(@RequestParam("id") final Long id){
+    @PutMapping("/hora/{id}")
+    public ResponseEntity<?> horaFinal(@PathVariable("id") final Long id){
         try {
-            this.movimentacaoService.horaFinal(id);
-            return ResponseEntity.ok("Registro alterado");
+            Relatorio relatorio = this.movimentacaoService.horaFinal(id);
+            return ResponseEntity.ok(relatorio);
 
         }catch (RuntimeException e){
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
-        final Movimentacao movimentacaoBanco = this.movimentacaoRepository.findById(id).orElse(null);
-            movimentacaoBanco.setAtivo(false);
-            this.movimentacaoService.deleta(movimentacaoBanco);
-        return ResponseEntity.ok("Movimentacao deletado");
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>excluir(@PathVariable("id") final Long id){
+        try {
+            this.movimentacaoService.excluir(id);
+            return ResponseEntity.ok("Registro excluido com sucesso.");
+        }
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 }

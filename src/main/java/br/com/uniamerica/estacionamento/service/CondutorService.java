@@ -35,7 +35,7 @@ public class CondutorService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void editar(final Long id, final Condutor condutor){
 
         final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
@@ -53,26 +53,26 @@ public class CondutorService {
         Assert.isTrue(this.condutorRepository.findByCpf(condutor.getCpf()).isEmpty(), "cpf ja existe boy");
         Assert.isTrue(this.condutorRepository.findByTelefone(condutor.getTelefone()).isEmpty(), "numero ja existe boy");
 
-        Assert.isTrue(condutorBanco != null || !condutorBanco.getId().equals(condutor.getId()), "nao deu pra indentificar");
+        Assert.isTrue(condutorBanco != null || !condutorBanco.getId().equals(id), "nao deu pra indentificar");
 
         this.condutorRepository.save(condutor);
     }
 
 
-    @Transactional
-    public void deleta(final Condutor condutor){
+    @Transactional(rollbackFor = Exception.class)
+    public void excluir(final Long id){
         
-        final Condutor condutorBanco = this.condutorRepository.findById(condutor.getId()).orElse(null);
+        final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
 
         List<Movimentacao> movimentacaoLista = this.condutorRepository.findMovimentacaoByCondutor(condutorBanco);
-
-        System.out.println(movimentacaoLista);
 
         if(movimentacaoLista == null){
             this.condutorRepository.delete(condutorBanco);
         }else {
             condutorBanco.setAtivo(false);
-            this.condutorRepository.save(condutor);
+
         }
+        condutorBanco.setAtivo(false);
+        this.condutorRepository.save(condutorBanco);
     }
 }

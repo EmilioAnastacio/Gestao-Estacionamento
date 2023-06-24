@@ -23,7 +23,7 @@ public class CondutorController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
         return condutor == null
@@ -51,8 +51,8 @@ public class CondutorController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Condutor condutor) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable("id") final Long id, @RequestBody final Condutor condutor) {
         try {
             this.condutorService.editar(id, condutor);
             return ResponseEntity.ok("sucesso >" + condutor);
@@ -63,18 +63,15 @@ public class CondutorController {
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());
         }
     }
-    @DeleteMapping
-    public ResponseEntity<?>deleta(@RequestParam("id") final Long id){
-        final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
-        List<Movimentacao> movimentacao = this.condutorRepository.findMovimentacaoByCondutor(condutor);
-
-        if(movimentacao == null){
-            this.condutorService.deleta(condutor);
-        }else{
-            condutor.setAtivo(false);
-            this.condutorRepository.save(condutor);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?>deleta(@PathVariable("id") final Long id){
+        try {
+            this.condutorService.excluir(id);
+            return ResponseEntity.ok("Registro excluido com sucesso.");
         }
-        return ResponseEntity.ok("Condutor deletado");
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
 }

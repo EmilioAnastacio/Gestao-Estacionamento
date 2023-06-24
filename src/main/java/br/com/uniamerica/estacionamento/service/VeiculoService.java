@@ -17,8 +17,10 @@ public class VeiculoService {
     private VeiculoRepository veiculoRepository;
 
 
-    @Transactional
-    public void cadastrar(Veiculo veiculo){
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void cadastrar(final Veiculo veiculo){
 
         Assert.isTrue(veiculo.getPlaca() != null, "placa nao identificada");
         Assert.isTrue(veiculo.getModelo() != null, "modelo nao identificado");
@@ -35,10 +37,10 @@ public class VeiculoService {
 
     }
 
-    @Transactional
-    public void editar(Veiculo veiculo){
+    @Transactional(rollbackFor = Exception.class)
+    public void editar(final Long id,Veiculo veiculo){
 
-        final Veiculo veiculoBanco = this.veiculoRepository.findById(veiculo.getId()).orElse(null);
+        final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
 
         Assert.isTrue(veiculoRepository.findByPlaca(veiculo.getPlaca()).isEmpty(), "essa placa ja existe");
 
@@ -49,28 +51,30 @@ public class VeiculoService {
         Assert.isTrue(veiculo.getAno() != null, "ano nao foi colocado");
 
         String placaAntiga = "^[A-Z]{3}-\\d{4}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaAntiga), "formatação de placa errada");
         String placaNova = "^[A-Z]{3}\\d{1}[A-Z]{1}\\d{2}$";
-        Assert.isTrue(!veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
+        Assert.isTrue(veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
 
-        Assert.isTrue(veiculoBanco == null || !veiculoBanco.getId().equals(veiculo.getId()), "nao deu pra indentificar");
+        Assert.isTrue(veiculoBanco == null || !veiculoBanco.getId().equals(id), "nao deu pra indentificar");
 
         this.veiculoRepository.save(veiculo);
     }
 
-    @Transactional
-    public void deleta(final Veiculo veiculo){
+    @Transactional(rollbackFor = Exception.class)
+    public void excluir(final Long id){
 
-        final Veiculo veiculoBanco = this.veiculoRepository.findById(veiculo.getId()).orElse(null);
+        final Veiculo veiculoBanco = this.veiculoRepository.findById(id).orElse(null);
 
         List<Movimentacao> veiculoLista = this.veiculoRepository.findMovimentacaoByVeiculo(veiculoBanco);
 
         if (veiculoLista == null) {
-            this.veiculoRepository.delete(veiculo);
+            this.veiculoRepository.delete(veiculoBanco);
         } else {
             veiculoBanco.setAtivo(false);
-            this.veiculoRepository.save(veiculo);
+
         }
+        veiculoBanco.setAtivo(false);
+        this.veiculoRepository.save(veiculoBanco);
     }
 
 }

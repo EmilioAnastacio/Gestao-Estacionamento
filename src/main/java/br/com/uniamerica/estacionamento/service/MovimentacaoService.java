@@ -3,7 +3,6 @@ package br.com.uniamerica.estacionamento.service;
 import br.com.uniamerica.estacionamento.Relatorio;
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Configuracao;
-import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.repository.CondutorRepository;
 import br.com.uniamerica.estacionamento.repository.ConfiguracaoRepository;
@@ -30,7 +29,7 @@ public class MovimentacaoService {
     @Autowired
     private CondutorRepository condutorRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void cadastrar(Movimentacao movi){
 
         Assert.isTrue(movi.getVeiculo() != null, "Veiculo nao informado");
@@ -42,7 +41,7 @@ public class MovimentacaoService {
 
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void editar(final Long id, Movimentacao movi){
 
         Assert.isTrue(movi.getVeiculo() != null, "Veiculo nao informado");
@@ -58,7 +57,7 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public void horaFinal(final Long id){
+    public Relatorio horaFinal(final Long id){
 
         //busca a movimentacao do momento
         final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
@@ -120,15 +119,18 @@ public class MovimentacaoService {
 
         this.condutorRepository.save(condutor);
         this.movimentacaoRepository.save(moviBanco);
+
+        return new Relatorio(moviBanco.getEntrada(),moviBanco.getSaida(),moviBanco.getCondutor(),moviBanco.getVeiculo(),
+                moviBanco.getTempoHora(), moviBanco.getTempoDesc(),moviBanco.getValorTotal(),moviBanco.getValorDeconto());
     }
 
-    @Transactional
-    public void deleta(final Movimentacao movi){
+    @Transactional(rollbackFor = Exception.class)
+    public void excluir(final Long id){
 
-        final Movimentacao moviBanco = this.movimentacaoRepository.findById(movi.getId()).orElse(null);
+        final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
 
         moviBanco.setAtivo(Boolean.FALSE);
-        this.movimentacaoRepository.save(movi);
+        this.movimentacaoRepository.save(moviBanco);
     }
 
 }

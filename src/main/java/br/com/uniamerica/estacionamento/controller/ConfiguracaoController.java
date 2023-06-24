@@ -21,7 +21,7 @@ public class ConfiguracaoController {
     private ConfiguracaoService configuracaoService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id){
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
 
         final Configuracao configuracao = this.configuracaoRepository.findById(id).orElse(null);
         return configuracao == null
@@ -29,33 +29,33 @@ public class ConfiguracaoController {
                 : ResponseEntity.ok(configuracao);
     }
 
+    @GetMapping("/lista")
+    public ResponseEntity<?> listaCompleta(){
+        return ResponseEntity.ok(this.configuracaoRepository.findAll());
+    }
+
+
     @PostMapping
-    public ResponseEntity<?> configuracao(@RequestBody final Configuracao configuracao){
+    public ResponseEntity<?> cadastrar(@RequestBody final Configuracao configuracao){
         try{
-            this.configuracaoRepository.save(configuracao);
+            this.configuracaoService.cadastrar(configuracao);
             return ResponseEntity.ok("REGISTRO CADASTRADO COM SUCESSO");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("erro" +e.getStackTrace());
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Configuracao configuracao) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable("id") final Long id, @RequestBody final Configuracao configuracao) {
 
         try {
-            final Configuracao configuracaoBanco = this.configuracaoRepository.findById(id).orElse(null);
-
-            if(configuracaoBanco == null || !configuracaoBanco.getId().equals(configuracao.getId())){
-                throw new RuntimeException("O registro nao foi encontrado");
-            }
-
-            this.configuracaoRepository.save(configuracao);
-            return ResponseEntity.ok("registro cadastrado");
-
+            this.configuracaoService.editar(id, configuracao);
+            return ResponseEntity.ok("Registro atualizado com sucesso. ");
         }catch (DataIntegrityViolationException e){
             return ResponseEntity.internalServerError().body("erro" + e.getCause().getCause().getMessage());
         }catch (RuntimeException e){
             return ResponseEntity.internalServerError().body("erro" + e.getMessage());
         }
     }
+
 }

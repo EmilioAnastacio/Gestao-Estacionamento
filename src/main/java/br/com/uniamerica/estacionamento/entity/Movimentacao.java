@@ -33,11 +33,11 @@ public class Movimentacao extends AbstractEntity{
     public LocalDateTime saida;
 
     @Getter@Setter
-    @Column(name = "tempo_hora", nullable = false)
+    @Column(name = "tempo_hora")
     public Integer tempoHora;
 
     @Getter@Setter
-    @Column(name = "tempo_minuto", nullable = false)
+    @Column(name = "tempo_minuto")
     public Integer tempoMinuto;
 
     @Getter@Setter
