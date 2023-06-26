@@ -56,72 +56,62 @@ public class MovimentacaoService {
         movimentacaoRepository.save(movi);
     }
 
-    @Transactional
-    public Relatorio horaFinal(final Long id){
+    @Transactional(rollbackFor = Exception.class)
+    public Relatorio finalizar(final Long id){
 
-        //busca a movimentacao do momento
-        final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
-        Assert.isTrue(moviBanco != null, "movimentacao nao encontrada");
+        final Movimentacao movimentacaoBanco = this.movimentacaoRepository.findById(id).orElse(null);
 
-        //busca uma duração q é entre a entrada e a saida
-        final LocalDateTime saida = LocalDateTime.now();
-        Duration duracaoHora = Duration.between(moviBanco.getEntrada(), saida);
+        Assert.isTrue(movimentacaoBanco != null, "Error registro nao encontrado");
 
-        //busca a configuração que esta sendo usada, no caso uma long 1, a primeira
-        final Configuracao configuracao = this.configuracaoRepository.findById(1L).orElse(null);
-        Assert.isTrue(configuracao != null, "configuracao nao existe");
+        // Assert.isTrue(movimentacaoBanco.getSaida() == null,"Essa movimentacao ja foi finalizada. ID:" + movimentacaoBanco.getId());
 
-        //busca o condutor
-        final Condutor condutor = this.condutorRepository.findById(moviBanco.getCondutor().getId()).orElse(null);
-        Assert.isTrue(condutor != null, "condutor nao existe");
+        LocalDateTime saida = LocalDateTime.now();
 
-        //Set no tempo pra receber da duração entre saida e entrada a parte dos minutos e horas
-        moviBanco.setTempoMinuto(duracaoHora.toMinutesPart());
-        moviBanco.setTempoHora(duracaoHora.toHoursPart());
-        moviBanco.setSaida(saida);
+        Duration duracao = Duration.between(movimentacaoBanco.getEntrada(), saida);
 
-        //variavel hora recebendo como bigdeciaml o set feito em cima das horas e minutos
-        final BigDecimal hora = BigDecimal.valueOf(duracaoHora.toHoursPart());
-        final BigDecimal minuto = BigDecimal.valueOf(duracaoHora.toMinutesPart()).divide(BigDecimal.valueOf(60),2, RoundingMode.HALF_EVEN);
+        Configuracao config = this.configuracaoRepository.findById(1L).orElse(null);
 
-        //conta para o preco, busca da configuração o valor da hora e multiplica pela quantidade de hora passada acima,
-        // e adiciona apos isso o calculo dos minutos
-        BigDecimal precos = configuracao.getValorHora().multiply(hora).add(configuracao.getValorHora().multiply(minuto));
+        Condutor alguem = this.condutorRepository.findById(movimentacaoBanco.getCondutor().getId()).orElse(null);
 
-        //mesma situação, cria um bigDecimal pra buscar o tempoDesconto q ele tem.
-        final BigDecimal tempoDesc = condutor.getTempoDesconto() != null ? condutor.getTempoDesconto() : new BigDecimal(0);
+        movimentacaoBanco.setSaida(saida);
+        //movimentacaoBanco.setHoras(horas);
 
-        //e se caso um desconto existir,o condutor tem seu tempo de desconto adicionado.
-        if(configuracao.getGerarDesconto()){
-            condutor.setTempoDesconto(condutor.getTempoDesconto().add(hora.add(minuto)));
+        final BigDecimal horas = BigDecimal.valueOf(duracao.toHoursPart());
+        final BigDecimal minutos = BigDecimal.valueOf(duracao.toMinutesPart()).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_EVEN);
+        BigDecimal preco = config.getValorHora().multiply(horas).add(config.getValorHora().multiply(minutos));
+
+
+        if(config.isGerarDesconto()){
+            if(alguem.getTempoDesconto().compareTo(new BigDecimal(config.getNecessarioDesconto())) > 0){
+                System.out.println(alguem.getTempoDesconto().compareTo(new BigDecimal(config.getNecessarioDesconto())));
+                movimentacaoBanco.setValorDeconto(preco.subtract(config.getTempoDesconto()));
+            }else{
+                alguem.setTempoDesconto(horas.add(minutos));
+            }
+        }else{
+            alguem.setTempoDesconto(horas.add(minutos));
         }
 
-        //iniciado uma variavel como bigdeciaml em 0
-        BigDecimal valor_desconto = BigDecimal.ZERO;
+        Integer horasI = horas.intValue();
+        Integer minutosI = minutos.intValue();
 
-        //verifica se ele precisa do desconto ou nao, um boolean
-        if(tempoDesc.compareTo(new BigDecimal(configuracao.getNecessarioDesconto())) >= 0){
+        alguem.setTempoPago(preco);
 
-            //conta de valor do desconto, pega o valor da hora e multiplica pelo tempo de desconto
-            valor_desconto = configuracao.getValorHora().multiply(tempoDesc);
+        movimentacaoBanco.setTempoHora(horasI);
+        movimentacaoBanco.setTempoMinuto(minutosI);
+        movimentacaoBanco.setValorHoraTotal(preco);
 
-            //set no movimentação para o valor do desconto, ou seja, precos - o valor
-            moviBanco.setValorDeconto(precos.subtract(valor_desconto));
-            condutor.setTempoDesconto(new BigDecimal(0));
-        }
+        this.movimentacaoRepository.save(movimentacaoBanco);
 
-        //sets no banco, do preco com o valor de desconto
-        moviBanco.setValorTotal(precos.subtract(valor_desconto));
-        moviBanco.setValorHoraTotal(configuracao.getValorHora());
-        moviBanco.setValorHoraTotal(configuracao.getValorMinutoMulta());
+        return new Relatorio(movimentacaoBanco.getEntrada(),
+                movimentacaoBanco.getSaida(),
+                movimentacaoBanco.getCondutor(),
+                movimentacaoBanco.getVeiculo(),
+                movimentacaoBanco.getTempoHora(),
+                movimentacaoBanco.getCondutor().getTempoDesconto(),
+                movimentacaoBanco.getValorHoraTotal(),
+                movimentacaoBanco.getValorDeconto());
 
-
-
-        this.condutorRepository.save(condutor);
-        this.movimentacaoRepository.save(moviBanco);
-
-        return new Relatorio(moviBanco.getEntrada(),moviBanco.getSaida(),moviBanco.getCondutor(),moviBanco.getVeiculo(),
-                moviBanco.getTempoHora(), moviBanco.getTempoDesc(),moviBanco.getValorTotal(),moviBanco.getValorDeconto());
     }
 
     @Transactional(rollbackFor = Exception.class)

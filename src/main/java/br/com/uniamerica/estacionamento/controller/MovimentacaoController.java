@@ -64,10 +64,10 @@ public class MovimentacaoController {
         }
     }
 
-    @PutMapping("/hora/{id}")
-    public ResponseEntity<?> horaFinal(@PathVariable("id") final Long id){
+    @PutMapping("/finalizar/{id}")
+    public ResponseEntity<?> finalizar(@PathVariable("id") final Long id){
         try {
-            Relatorio relatorio = this.movimentacaoService.horaFinal(id);
+            Relatorio relatorio = this.movimentacaoService.finalizar(id);
             return ResponseEntity.ok(relatorio);
 
         }catch (RuntimeException e){

@@ -35,7 +35,7 @@ public class Configuracao extends AbstractEntity{
 
     @Getter@Setter
     @Column(name = "gerar_desconto")
-    private Boolean gerarDesconto;
+    private boolean gerarDesconto;
 
     @Getter@Setter
     @Column(name = "necessario_desconto")

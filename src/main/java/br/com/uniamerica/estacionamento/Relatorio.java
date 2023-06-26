@@ -2,54 +2,53 @@ package br.com.uniamerica.estacionamento;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 
 public class Relatorio {
-    
+
     @Getter
     @Setter
     private LocalDateTime entrada;
-    @Getter
-    @Setter
+
+    @Getter @Setter
     private LocalDateTime saida;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private Condutor condutor;
-    @Getter
-    @Setter
+
+    @Getter @Setter
     private Veiculo veiculo;
 
-    @Getter
-    @Setter
-    private Integer quantidadeHoras;
-    @Getter
-    @Setter
-    private LocalTime quantidadeDesconto;
+    @Getter @Setter
+    private Integer horas;
 
-    @Getter
-    @Setter
-    private BigDecimal valorPagar;
-    @Getter
-    @Setter
-    private BigDecimal valorDesconto;
+    @Getter @Setter
+    private BigDecimal horasDesconto;
 
-    public Relatorio(LocalDateTime entrada, LocalDateTime saida, Condutor condutor, Veiculo veiculo, Integer quantidadeHoras, LocalTime quantidadeDesconto, BigDecimal valorPagar, BigDecimal valorDesconto) {
+    @Getter @Setter
+    private BigDecimal valor;
+
+    @Getter @Setter
+    private BigDecimal desconto;
+
+    public Relatorio(LocalDateTime entrada, LocalDateTime saida, Condutor condutor, Veiculo veiculo, Integer horas, BigDecimal horasDesconto, BigDecimal valor, BigDecimal desconto) {
         this.entrada = entrada;
         this.saida = saida;
         this.condutor = condutor;
         this.veiculo = veiculo;
-        this.quantidadeHoras = quantidadeHoras;
-        this.quantidadeDesconto = quantidadeDesconto;
-        this.valorPagar = valorPagar;
-        this.valorDesconto = valorDesconto;
+        this.horas = horas;
+        this.horasDesconto = horasDesconto;
+        this.valor = valor;
+        this.desconto = desconto;
     }
+
+    public Relatorio(){
+
+    }
+
 
 }
