@@ -32,10 +32,13 @@ public class MovimentacaoService {
     @Transactional(rollbackFor = Exception.class)
     public void cadastrar(Movimentacao movi){
 
+
+
         Assert.isTrue(movi.getVeiculo() != null, "Veiculo nao informado");
         Assert.isTrue(movi.getCondutor() != null, "Condutor nao informada");
         Assert.isTrue(movi.getEntrada() != null, "Entradada nao informado");
-        Assert.isTrue(movi.getSaida() != null, "Saida nao informada");
+        //Assert.isTrue(movi.getSaida() != null, "Saida nao informada");
+        Assert.isTrue(movimentacaoRepository.findVeiculo(movi.getVeiculo(), movi.getId()).isEmpty(),"veiculo ja estacionado");
 
         movimentacaoRepository.save(movi);
 
@@ -47,11 +50,11 @@ public class MovimentacaoService {
         Assert.isTrue(movi.getVeiculo() != null, "Veiculo nao informado");
         Assert.isTrue(movi.getCondutor() != null, "Condutor nao informada");
         Assert.isTrue(movi.getEntrada() != null, "Entradada nao informado");
-        Assert.isTrue(movi.getSaida() != null, "Saida nao informada");
+        //Assert.isTrue(movi.getSaida() != null, "Saida nao informada");
 
         final Movimentacao moviBanco = this.movimentacaoRepository.findById(id).orElse(null);
-        Assert.isTrue(moviBanco != null, "nao foi possivel encontrar o registro");
-        Assert.isTrue(!moviBanco.getId().equals(movi.getId()), "nao foi possivel encontrar o registro");
+        //Assert.isTrue(moviBanco != null, "nao foi possivel encontrar o registro");
+        //Assert.isTrue(!moviBanco.getId().equals(movi.getId()), "nao foi possivel encontrar o registro");
 
         movimentacaoRepository.save(movi);
     }
@@ -64,6 +67,8 @@ public class MovimentacaoService {
         Assert.isTrue(movimentacaoBanco != null, "Error registro nao encontrado");
 
         // Assert.isTrue(movimentacaoBanco.getSaida() == null,"Essa movimentacao ja foi finalizada. ID:" + movimentacaoBanco.getId());
+
+        movimentacaoBanco.setAtivo(false);
 
         LocalDateTime saida = LocalDateTime.now();
 

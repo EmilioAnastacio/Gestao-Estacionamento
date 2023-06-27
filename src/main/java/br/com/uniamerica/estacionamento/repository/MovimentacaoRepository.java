@@ -14,4 +14,7 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
     @Query("from Movimentacao where saida = null")
     public List<Movimentacao> findAberto();
 
+    @Query("from Movimentacao where veiculo = :veiculo AND saida = null AND id != :id")
+    public List<Movimentacao> findVeiculo(@Param("veiculo")final Veiculo veiculo, @Param("id")final Long id);
+
 }

@@ -26,7 +26,7 @@ public class CondutorService {
         String cpf = "^\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}$";
         Assert.isTrue(condutor.getCpf().matches(cpf), "Error cpf com mascara errada");
 
-        String numero = "^\\(\\d{2}\\)\\d{9}";
+        String numero = "^\\(\\d{3}\\)\\d{9}";
         Assert.isTrue(condutor.getTelefone().matches(numero), "Erro no numero");
 
         Assert.isTrue(this.condutorRepository.findByCpf(condutor.getCpf()).isEmpty(), "cpf ja existe boy");
@@ -47,11 +47,12 @@ public class CondutorService {
         String cpf = "^\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}$";
         Assert.isTrue(condutor.getCpf().matches(cpf), "Erro no cpf");
 
-        String numero = "^\\(\\d{2}\\)\\d{9}";
+        String numero = "^\\(\\d{3}\\)\\d{9}";
         Assert.isTrue(condutor.getTelefone().matches(numero), "Erro no numero");
 
-        Assert.isTrue(this.condutorRepository.findByCpf(condutor.getCpf()).isEmpty(), "cpf ja existe boy");
-        Assert.isTrue(this.condutorRepository.findByTelefone(condutor.getTelefone()).isEmpty(), "numero ja existe boy");
+        Assert.isTrue(this.condutorRepository.findByCpfEditar(condutor.getCpf(), id).isEmpty(),"Error cpf ja existe");
+        Assert.isTrue(this.condutorRepository.findByTelefoneEditar(condutor.getTelefone(), id).isEmpty(),"Error telefone ja existe");
+
 
         Assert.isTrue(condutorBanco != null || !condutorBanco.getId().equals(id), "nao deu pra indentificar");
 

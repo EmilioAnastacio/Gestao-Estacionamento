@@ -33,6 +33,8 @@ public class VeiculoService {
         String placaNova = "^[A-Z]{3}\\d{1}[A-Z]{1}\\d{2}$";
         Assert.isTrue(!veiculo.getPlaca().matches(placaNova), "formatação de placa errada");
 
+        Assert.isTrue( veiculo.getAno() > 1990 && veiculo.getAno() <= 2023, "Ano invalido");
+
         this.veiculoRepository.save(veiculo);
 
     }

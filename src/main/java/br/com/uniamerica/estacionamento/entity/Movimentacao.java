@@ -16,7 +16,7 @@ public class Movimentacao extends AbstractEntity{
 
     @Getter@Setter
     @ManyToOne
-    @JoinColumn(name = "veiculos", nullable = false, unique = true)
+    @JoinColumn(name = "veiculos", nullable = false)
     private Veiculo veiculo;
 
     @Getter@Setter
@@ -29,7 +29,7 @@ public class Movimentacao extends AbstractEntity{
     public LocalDateTime entrada;
 
     @Getter@Setter
-    @Column(name = "saida", nullable = false)
+    @Column(name = "saida")
     public LocalDateTime saida;
 
     @Getter@Setter
